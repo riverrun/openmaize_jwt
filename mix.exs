@@ -14,7 +14,7 @@ defmodule OpenmaizeJWT.Mixfile do
       name: "Openmaize",
       description: @description,
       package: package,
-      source_url: "https://github.com/riverrun/openmaize_jwt",
+      source_url: "https://github.com/riverrun/openmaizejwt",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps]
@@ -36,7 +36,7 @@ defmodule OpenmaizeJWT.Mixfile do
     [
       maintainers: ["David Whitlock"],
       licenses: ["BSD"],
-      links: %{"GitHub" => "https://github.com/riverrun/openmaize_jwt",
+      links: %{"GitHub" => "https://github.com/riverrun/openmaizejwt",
         "Docs" => "http://hexdocs.pm/openmaize_jwt"}
     ]
   end
