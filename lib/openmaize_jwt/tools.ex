@@ -3,7 +3,7 @@ defmodule OpenmaizeJWT.Tools do
   Various tools that are used with the management of JSON Web Tokens.
   """
 
-  alias Openmaize.Keymanager
+  alias OpenmaizeJWT.KeyManager
 
   @doc """
   The hash to be used when checking the signature.
@@ -16,14 +16,14 @@ defmodule OpenmaizeJWT.Tools do
   The secret key to be used to check the signature.
   """
   def get_key(kid) do
-    Keymanager.get_key(kid)
+    KeyManager.get_key(kid)
   end
 
   @doc """
   The current value for `kid` in the JWT header.
   """
   def current_kid do
-    Keymanager.get_current_kid
+    KeyManager.get_current_kid
   end
 
   @doc """

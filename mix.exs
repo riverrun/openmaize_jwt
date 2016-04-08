@@ -11,7 +11,7 @@ defmodule OpenmaizeJWT.Mixfile do
     [app: :openmaize_jwt,
       version: @version,
       elixir: "~> 1.2",
-      name: "Openmaize",
+      name: "OpenmaizeJWT",
       description: @description,
       package: package,
       source_url: "https://github.com/riverrun/openmaizejwt",
@@ -21,14 +21,17 @@ defmodule OpenmaizeJWT.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :cowboy, :plug]]
+    [mod: {OpenmaizeJWT, []},
+      applications: [:logger, :cowboy, :plug]]
   end
 
   defp deps do
     [
       {:cowboy, "~> 1.0"},
       {:plug, "~> 1.1"},
-      {:poison, ">= 1.5.0"}
+      {:poison, ">= 1.5.0"},
+      {:earmark, "~> 0.2", only: :dev},
+      {:ex_doc,  "~> 0.11", only: :dev}
     ]
   end
 
