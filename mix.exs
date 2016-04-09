@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWT.Mixfile do
   use Mix.Project
 
-  @version "0.8.0"
+  @version "0.8.2"
 
   @description """
   JSON Web Token library for use with the Openmaize authentication library.

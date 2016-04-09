@@ -5,6 +5,7 @@ defmodule OpenmaizeJWT.Verify do
 
   import Base
   import OpenmaizeJWT.Tools
+  alias OpenmaizeJWT.LogoutManager
 
   @doc """
   Decode the JWT and check that it is valid.
@@ -15,6 +16,7 @@ defmodule OpenmaizeJWT.Verify do
   algorithm, either HMAC-sha512 or HMAC-sha256.
   """
   def verify_token(token) do
+    LogoutManager.query_jwt(token) or
     :binary.split(token, ".", [:global]) |> check_valid
   end
 

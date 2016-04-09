@@ -7,6 +7,7 @@ defmodule OpenmaizeJWT.Supervisor do
 
   def init([]) do
     children = [
+      worker(OpenmaizeJWT.LogoutManager, []),
       worker(OpenmaizeJWT.KeyManager, [])
     ]
     supervise(children, strategy: :one_for_one)
