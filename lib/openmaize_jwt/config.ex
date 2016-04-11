@@ -10,6 +10,15 @@ defmodule OpenmaizeJWT.Config do
   | token_validity     | int     | 120 (minutes)  |
   | keyrotate_days     | int     | 28       |
 
+  ## Examples
+
+  The simplest way to change the default values would be to add
+  an `openmaize_jwt` entry to the `config.exs` file in your project,
+  like the following example.
+
+      config :openmaize_jwt,
+        token_alg: :sha256,
+        token_validity: 60
   """
 
   @doc """

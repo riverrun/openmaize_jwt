@@ -1,18 +1,8 @@
 defmodule OpenmaizeJWT.Plug do
   @moduledoc """
-  Module to generate JSON Web Tokens and send them to the user, either
-  by storing the token in a cookie or by sending the token in the body of
-  the response.
+  Generate JSON Web Tokens (JWTs) and add them to the connection.
 
-  ## JSON Web Tokens
-
-  JSON Web Tokens (JWTs) are an alternative to using cookies to identify,
-  and provide information about, users after they have logged in.
-
-  One main advantage of using JWTs is that there is no need to keep a
-  session store as the token can be used to contain user information.
-  It is important, though, not to keep sensitive information in the
-  token as the information is not encrypted -- it is just encoded.
+  ## Storage of JSON Web Tokens
 
   The JWTs need to be stored somewhere, either in cookies or sessionStorage
   (or localStorage), so that they can be used in subsequent requests.
@@ -24,7 +14,6 @@ defmodule OpenmaizeJWT.Plug do
   you will not need to use the `protect_from_forgery` (csrf protection) plug.
   However, storing tokens in sessionStorage opens up the risk of cross-site
   scripting attacks.
-
   """
 
   import Plug.Conn
@@ -32,9 +21,9 @@ defmodule OpenmaizeJWT.Plug do
   alias OpenmaizeJWT.Config
 
   @doc """
-  Generate token based on the user information.
+  Generate JWT based on the user information.
 
-  The token is then either stored in a cookie or sent in the body of the
+  The JWT is then either stored in a cookie or added to the body of the
   response.
   """
   def add_token(conn, user, {storage, uniq}) do

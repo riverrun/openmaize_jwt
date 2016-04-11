@@ -2,7 +2,7 @@ defmodule OpenmaizeJWT.Create do
   @moduledoc """
   Module to create JSON Web Tokens.
 
-  ## Default token
+  ## JSON Web Token structure
 
   The header contains values for `typ`, which is "JWT", `alg`, which can be
   "HS256" or "HS512" (the default), and `kid`, which is used to identify
@@ -21,7 +21,7 @@ defmodule OpenmaizeJWT.Create do
   Generate a JSON Web Token.
 
   This function is usually called by the `add_token` function in the
-  OpenmaizeJWT module, but it can also be called directly.
+  OpenmaizeJWT.Plug module, but it can also be called directly.
 
   `user` is a map containing the user information, which needs to contain
   values for `id`, a unique identifier, which is `username` by default, `role`,

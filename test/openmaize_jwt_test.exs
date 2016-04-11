@@ -11,7 +11,7 @@ defmodule OpenmaizeJWTTest do
     {:ok, error_jwt} = %{id: 1, name: "Raymond Luxury Yacht"}
     |> generate_token({0, 7200})
 
-    {:ok, add_to_store} = %{id: 1, name: "Raymond Luxury Yacht", role: "user"}
+    {:ok, add_to_store} = %{id: 2, name: "Gladys Stoate", role: "user"}
     |> generate_token({0, 7200})
     LogoutManager.store_jwt(add_to_store)
 
