@@ -8,6 +8,7 @@ defmodule OpenmaizeJWT.Config do
   | :----------------- | :------ | -------: |
   | token_alg          | atom    | :sha512  |
   | token_validity     | int     | 120 (minutes)  |
+  | token_data         | list    | []       |
   | keyrotate_days     | int     | 28       |
 
   ## Examples
@@ -18,7 +19,8 @@ defmodule OpenmaizeJWT.Config do
 
       config :openmaize_jwt,
         token_alg: :sha256,
-        token_validity: 60
+        token_validity: 60,
+        token_data: [:iss, :aud]
   """
 
   @doc """
@@ -43,6 +45,16 @@ defmodule OpenmaizeJWT.Config do
   """
   def token_validity do
     Application.get_env(:openmaize_jwt, :token_validity, 120)
+  end
+
+  @doc """
+  Additional information to be added to the token.
+
+  This needs to be a list of atoms. The default is an empty list.
+  Each atom in the list should be in the database user model.
+  """
+  def token_data do
+    Application.get_env(:openmaize_jwt, :token_data, [])
   end
 
   @doc """

@@ -24,4 +24,13 @@ defmodule OpenmaizeJWTPlugTest do
     assert conn.private.openmaize_user.role == "user"
   end
 
+  test "token with additional data" do
+    user = %{id: 1, username: "Raymond Luxury Yacht", role: "user", iss: "example.com"}
+    Application.put_env(:openmaize_jwt, :token_data, [:iss])
+    conn = conn(:get, "/") |> add_token(user, {nil, :username})
+    assert conn.private.openmaize_user.id == 1
+    assert conn.private.openmaize_user.role == "user"
+    assert conn.private.openmaize_user.iss == "example.com"
+  end
+
 end
