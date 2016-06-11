@@ -1,9 +1,10 @@
 defmodule OpenmaizeJWT.LogoutManager do
   use GenServer
 
-  alias OpenmaizeJWT.Config
+  import OpenmaizeJWT.Tools
 
-  @sixty_mins 3_600_000
+  @sixty_mins 10_000
+  #@sixty_mins 3_600_000
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -11,28 +12,28 @@ defmodule OpenmaizeJWT.LogoutManager do
 
   def init([]) do
     Process.send_after(self, :clean, @sixty_mins)
-    {:ok, %{jwtstore: create_subsets}}
+    {:ok, %{jwtstore: Map.new}}
   end
 
   def get_state(), do: GenServer.call(__MODULE__, :get_state)
 
   def query_jwt(jwt), do: GenServer.call(__MODULE__, {:query, jwt})
 
-  def store_jwt(jwt), do: GenServer.cast(__MODULE__, {:push, jwt})
+  def store_jwt(jwt, time), do: GenServer.cast(__MODULE__, {:push, jwt, time})
 
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
   def handle_call({:query, jwt}, _from, %{jwtstore: store} = state) do
-    {:reply, Enum.any?(store, &MapSet.member?(&1, jwt)), state}
+    {:reply, Map.has_key?(store, jwt), state}
   end
 
-  def handle_cast({:push, jwt}, %{jwtstore: [h|t]}) do
-    {:noreply, %{jwtstore: [MapSet.put(h, jwt) | t]}}
+  def handle_cast({:push, jwt, time}, %{jwtstore: store}) do
+    {:noreply, %{jwtstore: Map.put(store, jwt, time)}}
   end
 
   def handle_info(:clean, %{jwtstore: store}) do
-    store = update_store(store)
+    store = clean_store(store)
     Process.send_after(self, :clean, @sixty_mins)
     {:noreply, %{jwtstore: store}}
   end
@@ -45,17 +46,8 @@ defmodule OpenmaizeJWT.LogoutManager do
     {:ok, state}
   end
 
-  defp update_store(store) do
-    [MapSet.new | List.delete_at(store, -1)]
-  end
-
-  defp create_subsets do
-    num = get_numsets(Config.token_validity, 60)
-    for _ <- 1..num, do: MapSet.new
-  end
-
-  defp get_numsets(exp, setexp) do
-    floor = div(exp, setexp)
-    floor + (rem(exp, setexp) - floor > 0 and 2 || 1)
+  defp clean_store(store) do
+    time = current_time
+    :maps.filter fn _, y -> y > time end, store
   end
 end

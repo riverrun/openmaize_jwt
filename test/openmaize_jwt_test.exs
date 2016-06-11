@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWTTest do
   use ExUnit.Case
 
-  import OpenmaizeJWT.{Create, Verify}
+  import OpenmaizeJWT.{Create, Tools, Verify}
   alias OpenmaizeJWT.LogoutManager
 
   setup_all do
@@ -13,7 +13,7 @@ defmodule OpenmaizeJWTTest do
 
     {:ok, add_to_store} = %{id: 2, name: "Gladys Stoate", role: "user"}
     |> generate_token({0, 7200})
-    LogoutManager.store_jwt(add_to_store)
+    LogoutManager.store_jwt(add_to_store, current_time + 1_000_000)
 
     {:ok, %{ok_jwt: ok_jwt, error_jwt: error_jwt, add_to_store: add_to_store}}
   end
@@ -38,6 +38,13 @@ defmodule OpenmaizeJWTTest do
   test "verify fails after jwt has been added to jwt_store", %{add_to_store: add_to_store} do
     {:error, message} = verify_token(add_to_store)
     assert message =~ "logged out"
+  end
+
+  test "get expiration time" do
+    token = "1MTIifQ.eyJyb2xlIjoidXNlciIsIm5iZiI6MTQ2NTY1NDM0OTU0NywibmFtZSI6" <>
+    "IlJheW1vbmQgTHV4dXJ5IFlhY2h0IiwiaWQiOjEsImV4cCI6MTQ2NjA4NjM0OTU0N30.L4L4F0A"
+    exp = exp_value(token)
+    assert exp == 1466086349547
   end
 
 end

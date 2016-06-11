@@ -22,6 +22,15 @@ defmodule OpenmaizeJWT.Verify do
     end
   end
 
+  @doc """
+  Get the expiration time of the token.
+  """
+  def exp_value(token) do
+    [_, enc_payload, _] = :binary.split(token, ".", [:global])
+    %{exp: exp} = to_map(enc_payload)
+    exp
+  end
+
   defp check_valid([enc_header, enc_payload, sign]) do
     with [header, payload] <- Enum.map([enc_header, enc_payload], &to_map/1),
         {:ok, alg, kid} <- check_header(header),
