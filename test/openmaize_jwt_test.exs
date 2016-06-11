@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWTTest do
   use ExUnit.Case
 
-  import OpenmaizeJWT.{Create, Tools, Verify}
+  import OpenmaizeJWT.{Create, Verify}
   alias OpenmaizeJWT.LogoutManager
 
   setup_all do
@@ -13,7 +13,7 @@ defmodule OpenmaizeJWTTest do
 
     {:ok, add_to_store} = %{id: 2, name: "Gladys Stoate", role: "user"}
     |> generate_token({0, 7200})
-    LogoutManager.store_jwt(add_to_store, current_time + 1_000_000)
+    LogoutManager.store_jwt(add_to_store)
 
     {:ok, %{ok_jwt: ok_jwt, error_jwt: error_jwt, add_to_store: add_to_store}}
   end

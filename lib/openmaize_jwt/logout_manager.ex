@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWT.LogoutManager do
   use GenServer
 
-  import OpenmaizeJWT.Tools
+  import OpenmaizeJWT.{Tools, Verify}
 
   @sixty_mins 10_000
   #@sixty_mins 3_600_000
@@ -19,7 +19,7 @@ defmodule OpenmaizeJWT.LogoutManager do
 
   def query_jwt(jwt), do: GenServer.call(__MODULE__, {:query, jwt})
 
-  def store_jwt(jwt, time), do: GenServer.cast(__MODULE__, {:push, jwt, time})
+  def store_jwt(jwt), do: GenServer.cast(__MODULE__, {:push, jwt, exp_value(jwt)})
 
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
