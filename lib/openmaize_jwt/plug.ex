@@ -26,9 +26,9 @@ defmodule OpenmaizeJWT.Plug do
   The JWT is then either stored in a cookie or added to the body of the
   response.
   """
-  def add_token(conn, user, {storage, uniq}) do
+  def add_token(conn, user, storage, uniq, token_validity \\ Config.token_validity) do
     user = Map.take user, [:id, :role, uniq] ++ Config.token_data
-    {:ok, token} = generate_token user, {0, Config.token_validity}
+    {:ok, token} = generate_token user, {0, token_validity}
     put_token(conn, user, token, storage)
   end
 

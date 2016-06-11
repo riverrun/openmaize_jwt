@@ -20,7 +20,8 @@ defmodule OpenmaizeJWT.Config do
       config :openmaize_jwt,
         token_alg: :sha256,
         token_validity: 60,
-        token_data: [:iss, :aud]
+        token_data: [:iss, :aud],
+        keyrotate_days: 7
   """
 
   @doc """
@@ -51,7 +52,12 @@ defmodule OpenmaizeJWT.Config do
   Additional information to be added to the token.
 
   This needs to be a list of atoms. The default is an empty list.
-  Each atom in the list should be in the database user model.
+  Each atom in the list should be in the database user model. If any
+  entry in the list is not in the user model, it will be ignored.
+
+  ## Warning
+
+  Do not include any sensitive data in the JSON Web Token.
   """
   def token_data do
     Application.get_env(:openmaize_jwt, :token_data, [])
