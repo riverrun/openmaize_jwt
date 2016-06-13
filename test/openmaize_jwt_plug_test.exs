@@ -27,8 +27,8 @@ defmodule OpenmaizeJWTPlugTest do
   end
 
   test "token with additional data" do
-    user = %{id: 1, username: "Raymond Luxury Yacht", role: "user", iss: "example.com"}
     Application.put_env(:openmaize_jwt, :token_data, [:iss])
+    user = %{id: 1, username: "Raymond Luxury Yacht", role: "user", iss: "example.com"}
     conn = conn(:get, "/") |> add_token(user, nil, :username)
     assert conn.private.openmaize_user.id == 1
     assert conn.private.openmaize_user.role == "user"
@@ -36,8 +36,9 @@ defmodule OpenmaizeJWTPlugTest do
   end
 
   test "override token_validity config value" do
+    Application.put_env(:openmaize_jwt, :remember_token, -10)
     user = %{id: 1, username: "Raymond Luxury Yacht", role: "user"}
-    conn = conn(:get, "/") |> add_token(user, nil, :username, -120)
+    conn = conn(:get, "/") |> add_token(user, nil, :username, true)
     %{"access_token" => token} = Poison.Parser.parse!(conn.resp_body)
     {:error, message} = verify_token(token)
     assert message =~ "token has expired"

@@ -8,6 +8,7 @@ defmodule OpenmaizeJWT.Config do
   | :----------------- | :------ | -------: |
   | token_alg          | atom    | :sha512  |
   | token_validity     | int     | 120 (minutes)  |
+  | remember_token     | int     | 7 (days)  |
   | token_data         | list    | []       |
   | keyrotate_days     | int     | 28       |
 
@@ -20,6 +21,7 @@ defmodule OpenmaizeJWT.Config do
       config :openmaize_jwt,
         token_alg: :sha256,
         token_validity: 60,
+        remember_token: 14,
         token_data: [:iss, :aud],
         keyrotate_days: 7
   """
@@ -46,6 +48,15 @@ defmodule OpenmaizeJWT.Config do
   """
   def token_validity do
     Application.get_env(:openmaize_jwt, :token_validity, 120)
+  end
+
+  @doc """
+  The length of time after which a 'Remember me' JSON Web Token expires.
+
+  The default length of time is 7 days.
+  """
+  def remember_token do
+    Application.get_env(:openmaize_jwt, :remember_token, 10_080)
   end
 
   @doc """
