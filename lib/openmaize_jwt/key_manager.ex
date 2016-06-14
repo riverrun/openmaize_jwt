@@ -4,30 +4,30 @@ defmodule OpenmaizeJWT.KeyManager do
   alias OpenmaizeJWT.Config
 
   @oneday 86_400_000
+  @kids Enum.map 100..109, &to_string/1
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init([]) do
+    key_map = for kid <- @kids, into: %{}, do: {kid, nil}
+    state = %{key_map | "100" => gen_key}
+            |> Map.merge(%{"current_kid" => "100", "kid_index" => 0})
     Process.send_after(self, :rotate, Config.keyrotate_days * @oneday)
-    {:ok, %{key_1: get_key, key_2: get_key, current_kid: "1"}}
+    {:ok, state}
   end
 
-  def get_key("1"), do: GenServer.call(__MODULE__, :get_key_1)
-  def get_key("2"), do: GenServer.call(__MODULE__, :get_key_2)
+  def get_key(kid), do: GenServer.call(__MODULE__, {:get_key, kid})
 
   def get_current_kid do
     GenServer.call(__MODULE__, :get_current_kid)
   end
 
-  def handle_call(:get_key_1, _from, %{key_1: key} = state) do
-    {:reply, key, state}
+  def handle_call({:get_key, kid}, _from, state) do
+    {:reply, Map.get(state, kid), state}
   end
-  def handle_call(:get_key_2, _from, %{key_2: key} = state) do
-    {:reply, key, state}
-  end
-  def handle_call(:get_current_kid, _from, %{current_kid: kid} = state) do
+  def handle_call(:get_current_kid, _from, %{"current_kid" => kid} = state) do
     {:reply, kid, state}
   end
 
@@ -45,14 +45,13 @@ defmodule OpenmaizeJWT.KeyManager do
     {:ok, state}
   end
 
-  defp update_state(%{current_kid: "1"} = state) do
-    %{state | current_kid: "2", key_2: get_key}
-  end
-  defp update_state(%{current_kid: "2"} = state) do
-    %{state | current_kid: "1", key_1: get_key}
+  defp update_state(%{"kid_index" => idx} = state) do
+    index = if idx < 9, do: idx + 1, else: 0
+    kid = Enum.at @kids, index
+    %{state | kid => gen_key, "current_kid" => kid, "kid_index" => index}
   end
 
-  defp get_key do
+  defp gen_key do
     :crypto.strong_rand_bytes(32) |> Base.encode64
   end
 
