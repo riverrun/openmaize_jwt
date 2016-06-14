@@ -18,7 +18,7 @@ defmodule OpenmaizeJWT.Verify do
   def verify_token(token) do
     case LogoutManager.query_jwt(token) do
       false -> :binary.split(token, ".", [:global]) |> check_valid
-      _ -> {:error, "Already logged out."}
+      _ -> {:error, "Already logged out"}
     end
   end
 
@@ -54,24 +54,24 @@ defmodule OpenmaizeJWT.Verify do
     case alg do
       "HS512" -> {:ok, :sha512, kid}
       "HS256" -> {:ok, :sha256, kid}
-      other -> {:error, "The #{other} algorithm is not supported."}
+      other -> {:error, "The #{other} algorithm is not supported"}
     end
   end
-  defp check_header(_), do: {:error, "Invalid header."}
+  defp check_header(_), do: {:error, "Invalid header"}
 
   defp check_sign(alg, kid, sign, enc_header, enc_payload) do
     if sign |> urldec64 == get_mac(enc_header <> "." <> enc_payload, alg, kid) do
       :ok
     else
-      {:error, "Invalid token."}
+      {:error, "Invalid token"}
     end
   end
 
   defp check_payload(%{id: _id, role: _role, exp: exp, nbf: nbf}) do
     case nbf < current_time do
-      true -> exp > current_time and :ok || {:error, "The token has expired."}
-      _ -> {:error, "The token cannot be used yet."}
+      true -> exp > current_time and :ok || {:error, "The token has expired"}
+      _ -> {:error, "The token cannot be used yet"}
     end
   end
-  defp check_payload(_), do: {:error, "Incomplete token."}
+  defp check_payload(_), do: {:error, "Incomplete token"}
 end

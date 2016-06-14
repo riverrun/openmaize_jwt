@@ -30,15 +30,15 @@ defmodule OpenmaizeJWTPlugTest do
     Application.put_env(:openmaize_jwt, :token_data, [:iss])
     user = %{id: 1, username: "Raymond Luxury Yacht", role: "user", iss: "example.com"}
     conn = conn(:get, "/") |> add_token(user, nil, :username)
+    Application.delete_env(:openmaize_jwt, :token_data)
     assert conn.private.openmaize_user.id == 1
     assert conn.private.openmaize_user.role == "user"
     assert conn.private.openmaize_user.iss == "example.com"
   end
 
   test "override token_validity config value" do
-    Application.put_env(:openmaize_jwt, :remember_token, -10)
     user = %{id: 1, username: "Raymond Luxury Yacht", role: "user"}
-    conn = conn(:get, "/") |> add_token(user, nil, :username, true)
+    conn = conn(:get, "/") |> add_token(user, nil, :username, -10)
     %{"access_token" => token} = Poison.Parser.parse!(conn.resp_body)
     {:error, message} = verify_token(token)
     assert message =~ "token has expired"

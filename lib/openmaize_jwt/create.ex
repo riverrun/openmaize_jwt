@@ -31,19 +31,19 @@ defmodule OpenmaizeJWT.Create do
   """
   def generate_token(user, {nbf_delay, token_validity}) do
     nbf = get_nbf(nbf_delay * 60_000)
-    Map.merge(user, %{nbf: nbf, exp: get_expiry(nbf, token_validity * 60_000)})
+    Map.merge(user, %{nbf: nbf, exp: get_expiry(nbf, token_validity)})
     |> encode(Config.get_token_alg)
   end
 
   defp get_nbf(nbf_delay) when is_integer(nbf_delay) do
     current_time + nbf_delay - 10_000
   end
-  defp get_nbf(_), do: raise ArgumentError, "nbf should be an integer."
+  defp get_nbf(_), do: raise ArgumentError, "nbf should be an integer"
 
   defp get_expiry(nbf, token_validity) when is_integer(token_validity) do
-    nbf + token_validity
+    nbf + token_validity * 60_000
   end
-  defp get_expiry(_, _), do: raise ArgumentError, "exp should be an integer."
+  defp get_expiry(_, _), do: raise ArgumentError, "exp should be an integer"
 
   defp encode(payload, {header_alg, encode_alg}) do
     data = (%{typ: "JWT", alg: header_alg, kid: current_kid} |> from_map) <>
