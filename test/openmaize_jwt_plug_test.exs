@@ -27,13 +27,13 @@ defmodule OpenmaizeJWTPlugTest do
   end
 
   test "token with additional data" do
-    Application.put_env(:openmaize_jwt, :token_data, [:iss])
-    user = %{id: 1, username: "Raymond Luxury Yacht", role: "user", iss: "example.com"}
+    Application.put_env(:openmaize_jwt, :token_data, %{iss: "www.example.com"})
+    user = %{id: 1, username: "Raymond Luxury Yacht", role: "user"}
     conn = conn(:get, "/") |> add_token(user, nil, :username)
     Application.delete_env(:openmaize_jwt, :token_data)
     assert conn.private.openmaize_user.id == 1
     assert conn.private.openmaize_user.role == "user"
-    assert conn.private.openmaize_user.iss == "example.com"
+    assert conn.private.openmaize_user.iss == "www.example.com"
   end
 
   test "override token_validity config value" do

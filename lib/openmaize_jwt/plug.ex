@@ -28,7 +28,7 @@ defmodule OpenmaizeJWT.Plug do
   """
   def add_token(conn, user, storage, uniq, override_exp \\ nil) do
     token_validity = override_exp || Config.token_validity
-    user = Map.take user, [:id, :role, uniq] ++ Config.token_data
+    user = Map.take(user, [:id, :role, uniq]) |> Map.merge(Config.token_data)
     {:ok, token} = generate_token user, {0, token_validity}
     put_token(conn, user, token, storage)
   end
