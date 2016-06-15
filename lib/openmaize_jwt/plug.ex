@@ -30,14 +30,15 @@ defmodule OpenmaizeJWT.Plug do
     token_validity = override_exp || Config.token_validity
     user = Map.take(user, [:id, :role, uniq]) |> Map.merge(Config.token_data)
     {:ok, token} = generate_token user, {0, token_validity}
-    put_token(conn, user, token, storage)
+    put_token(conn, user, token, storage, token_validity)
   end
 
-  defp put_token(conn, user, token, :cookie) do
-    put_resp_cookie(conn, "access_token", token, [http_only: true])
+  defp put_token(conn, user, token, :cookie, validity) do
+    opts = [http_only: true, max_age: validity * 60]
+    put_resp_cookie(conn, "access_token", token, opts)
     |> put_private(:openmaize_user, user)
   end
-  defp put_token(conn, user, token, nil) do
+  defp put_token(conn, user, token, nil, _) do
     resp(conn, 200, ~s({"access_token": "#{token}"}))
     |> put_private(:openmaize_user, user)
   end

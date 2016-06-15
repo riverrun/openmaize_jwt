@@ -18,12 +18,17 @@ defmodule OpenmaizeJWT.KeyManager do
     {:ok, state}
   end
 
+  def get_state(), do: GenServer.call(__MODULE__, :get_state)
+
   def get_key(kid), do: GenServer.call(__MODULE__, {:get_key, kid})
 
   def get_current_kid do
     GenServer.call(__MODULE__, :get_current_kid)
   end
 
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
   def handle_call({:get_key, kid}, _from, state) do
     {:reply, Map.get(state, kid), state}
   end
@@ -32,9 +37,9 @@ defmodule OpenmaizeJWT.KeyManager do
   end
 
   def handle_info(:rotate, state) do
-    state = update_state(state)
+    newstate = update_state(state)
     Process.send_after(self, :rotate, Config.keyrotate_days * @oneday)
-    {:noreply, state}
+    {:noreply, newstate}
   end
 
   def handle_info(_msg, state) do
