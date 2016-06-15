@@ -4,7 +4,7 @@ defmodule OpenmaizeJWT.KeyManager do
   alias OpenmaizeJWT.Config
 
   @oneday 86_400_000
-  @kids Enum.map 100..109, &to_string/1
+  @kids Enum.map 100..105, &to_string/1
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -46,7 +46,7 @@ defmodule OpenmaizeJWT.KeyManager do
   end
 
   defp update_state(%{"kid_index" => idx} = state) do
-    index = if idx < 9, do: idx + 1, else: 0
+    index = if idx < 5, do: idx + 1, else: 0
     kid = Enum.at @kids, index
     %{state | kid => gen_key, "current_kid" => kid, "kid_index" => index}
   end

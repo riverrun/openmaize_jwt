@@ -3,8 +3,7 @@ defmodule OpenmaizeJWT.LogoutManager do
 
   import OpenmaizeJWT.{Tools, Verify}
 
-  @sixty_mins 10_000
-  #@sixty_mins 3_600_000
+  @sixty_mins 3_600_000
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
