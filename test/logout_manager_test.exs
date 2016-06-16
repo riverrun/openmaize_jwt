@@ -18,8 +18,4 @@ defmodule LogoutManagerTest do
     refute LM.query_jwt(jwt <> "a")
   end
 
-  test "clean jwt store" do
-    state = LM.get_state()
-  end
-
 end
