@@ -40,7 +40,7 @@ defmodule OpenmaizeJWT.Verify do
   end
 
   defp to_map(input) do
-    input |> urldec64 |> Poison.decode!(keys: :atoms!)
+    input |> urldec64 |> Poison.decode!(keys: :atoms)
   end
   defp urldec64(data) do
     data <> case rem(byte_size(data), 4) do
