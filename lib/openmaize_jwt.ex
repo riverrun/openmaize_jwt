@@ -22,13 +22,13 @@ defmodule OpenmaizeJWT do
   end
 
   @doc """
-  Restart the keymanager child process without keeping state.
+  Restart the keymanager child process.
 
-  This can be used to remove the old keys and generate new ones.
-  After being stopped, the keymanager will be restarted and new keys
-  will be created.
+  If the reason is :normal, which is the default, the state will be
+  saved. If you want to remove the old keys and generate new ones,
+  set the reason to :kill.
   """
-  def restart_keymanager do
-    Process.whereis(OpenmaizeJWT.KeyManager) |> Process.exit(:kill)
+  def restart_keymanager(reason \\ :normal) do
+    Process.whereis(OpenmaizeJWT.KeyManager) |> Process.exit(reason)
   end
 end

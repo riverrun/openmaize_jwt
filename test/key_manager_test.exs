@@ -20,4 +20,7 @@ defmodule KeyManagerTest do
     assert current_kid == "101"
   end
 
+  test "get state from file" do
+  end
+
 end
