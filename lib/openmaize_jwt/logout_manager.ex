@@ -14,7 +14,7 @@ defmodule OpenmaizeJWT.LogoutManager do
     Process.flag(:trap_exit, true)
     state = case File.read(@logout_state) do
       {:ok, state} -> Poison.decode!(state)
-      {:error, _} -> %{jwtstore: Map.new()}
+      {:error, _} -> Map.new()
     end
     File.rm @logout_state
     Process.send_after(self, :clean, @sixty_mins)
@@ -30,18 +30,17 @@ defmodule OpenmaizeJWT.LogoutManager do
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
-  def handle_call({:query, jwt}, _from, %{jwtstore: store} = state) do
-    {:reply, Map.has_key?(store, jwt), state}
+  def handle_call({:query, jwt}, _from, state) do
+    {:reply, Map.has_key?(state, jwt), state}
   end
 
-  def handle_cast({:push, jwt, time}, %{jwtstore: store}) do
-    {:noreply, %{jwtstore: Map.put(store, jwt, time)}}
+  def handle_cast({:push, jwt, time}, state) do
+    {:noreply, Map.put(state, jwt, time)}
   end
 
-  def handle_info(:clean, %{jwtstore: store}) do
-    store = clean_store(store)
+  def handle_info(:clean, state) do
     Process.send_after(self, :clean, @sixty_mins)
-    {:noreply, %{jwtstore: store}}
+    {:noreply, clean_store(state)}
   end
 
   def handle_info(_msg, state) do
