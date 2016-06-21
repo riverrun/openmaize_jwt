@@ -18,7 +18,7 @@ defmodule OpenmaizeJWT.KeyManager do
       {:error, _} -> init_keys()
     end
     File.rm @key_state
-    Process.send_after(self, :rotate, Config.keyrotate_days * @oneday)
+    Process.send_after(self(), :rotate, Config.keyrotate_days * @oneday)
     {:ok, state}
   end
 
@@ -42,7 +42,7 @@ defmodule OpenmaizeJWT.KeyManager do
 
   def handle_info(:rotate, state) do
     newstate = update_state(state)
-    Process.send_after(self, :rotate, Config.keyrotate_days * @oneday)
+    Process.send_after(self(), :rotate, Config.keyrotate_days * @oneday)
     {:noreply, newstate}
   end
 
@@ -62,7 +62,7 @@ defmodule OpenmaizeJWT.KeyManager do
   defp update_state(%{"kid_index" => idx} = state) do
     index = if idx < 5, do: idx + 1, else: 0
     kid = Enum.at @kids, index
-    %{state | kid => gen_key, "current_kid" => kid, "kid_index" => index}
+    %{state | kid => gen_key(), "current_kid" => kid, "kid_index" => index}
   end
 
   defp gen_key do
@@ -71,7 +71,7 @@ defmodule OpenmaizeJWT.KeyManager do
 
   defp init_keys do
     key_map = for kid <- @kids, into: %{}, do: {kid, nil}
-    %{key_map | "100" => gen_key}
+    %{key_map | "100" => gen_key()}
     |> Map.merge(%{"current_kid" => "100", "kid_index" => 0})
   end
 end

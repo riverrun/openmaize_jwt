@@ -23,7 +23,7 @@ defmodule OpenmaizeJWT.Tools do
   The current value for `kid` in the JWT header.
   """
   def current_kid do
-    KeyManager.get_current_kid
+    KeyManager.get_current_kid()
   end
 
   @doc """

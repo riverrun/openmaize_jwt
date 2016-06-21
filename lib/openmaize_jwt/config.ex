@@ -30,7 +30,7 @@ defmodule OpenmaizeJWT.Config do
   The default value is :sha512, and :sha256 is also supported.
   """
   def get_token_alg do
-    case token_alg do
+    case token_alg() do
       :sha256 -> {"HS256", :sha256}
       _ -> {"HS512", :sha512}
     end

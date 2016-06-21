@@ -17,7 +17,7 @@ defmodule OpenmaizeJWT.LogoutManager do
       {:error, _} -> Map.new()
     end
     File.rm @logout_state
-    Process.send_after(self, :clean, @sixty_mins)
+    Process.send_after(self(), :clean, @sixty_mins)
     {:ok, state}
   end
 
@@ -39,7 +39,7 @@ defmodule OpenmaizeJWT.LogoutManager do
   end
 
   def handle_info(:clean, state) do
-    Process.send_after(self, :clean, @sixty_mins)
+    Process.send_after(self(), :clean, @sixty_mins)
     {:noreply, clean_store(state)}
   end
 
@@ -57,7 +57,7 @@ defmodule OpenmaizeJWT.LogoutManager do
   end
 
   defp clean_store(store) do
-    time = current_time
+    time = current_time()
     :maps.filter fn _, y -> y > time end, store
   end
 end

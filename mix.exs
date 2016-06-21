@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWT.Mixfile do
   use Mix.Project
 
-  @version "0.10.2"
+  @version "0.10.4"
 
   @description """
   JSON Web Token library for use with the Openmaize authentication library.
@@ -13,11 +13,11 @@ defmodule OpenmaizeJWT.Mixfile do
       elixir: "~> 1.2",
       name: "OpenmaizeJWT",
       description: @description,
-      package: package,
+      package: package(),
       source_url: "https://github.com/riverrun/openmaize_jwt",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps]
+      deps: deps()]
   end
 
   def application do

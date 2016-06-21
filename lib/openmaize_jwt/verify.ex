@@ -68,8 +68,8 @@ defmodule OpenmaizeJWT.Verify do
   end
 
   defp check_payload(%{id: _id, role: _role, exp: exp, nbf: nbf}) do
-    case nbf < current_time do
-      true -> exp > current_time and :ok || {:error, "The token has expired"}
+    case nbf < current_time() do
+      true -> exp > current_time() and :ok || {:error, "The token has expired"}
       _ -> {:error, "The token cannot be used yet"}
     end
   end
