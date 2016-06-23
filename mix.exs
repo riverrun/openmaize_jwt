@@ -1,7 +1,7 @@
 defmodule OpenmaizeJWT.Mixfile do
   use Mix.Project
 
-  @version "0.10.4"
+  @version "0.11.0"
 
   @description """
   JSON Web Token library for use with the Openmaize authentication library.
@@ -28,7 +28,7 @@ defmodule OpenmaizeJWT.Mixfile do
   defp deps do
     [{:cowboy, "~> 1.0"},
      {:plug, "~> 1.1"},
-     {:poison, ">= 1.5.0"},
+     {:poison, "~> 2.0"},
      {:earmark, "~> 0.2", only: :dev},
      {:ex_doc,  "~> 0.12", only: :dev}]
   end
