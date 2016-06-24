@@ -28,7 +28,7 @@ defmodule OpenmaizeJWT.Mixfile do
   defp deps do
     [{:cowboy, "~> 1.0"},
      {:plug, "~> 1.1"},
-     {:poison, "~> 2.0"},
+     {:poison, "~> 1.5 or ~> 2.0"},
      {:earmark, "~> 0.2", only: :dev},
      {:ex_doc,  "~> 0.12", only: :dev}]
   end

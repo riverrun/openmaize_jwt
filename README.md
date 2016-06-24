@@ -9,7 +9,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   1. Add openmaize_jwt to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:openmaize_jwt, "~> 0.10"}]
+          [{:openmaize_jwt, "~> 0.11"}]
         end
 
   2. Ensure openmaize_jwt is started before your application:
