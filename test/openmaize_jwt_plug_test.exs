@@ -44,4 +44,12 @@ defmodule OpenmaizeJWTPlugTest do
     assert message =~ "token has expired"
   end
 
+  test "token without role" do
+    user = %{id: 1, username: "Raymond Luxury Yacht"}
+    conn = conn(:get, "/") |> add_token(user, nil, :username)
+    assert String.starts_with?(conn.resp_body, "{\"access_token\":")
+    assert conn.status == 200
+    assert conn.private.openmaize_user.id == 1
+  end
+
 end

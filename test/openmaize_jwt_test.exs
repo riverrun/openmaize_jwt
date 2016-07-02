@@ -8,14 +8,18 @@ defmodule OpenmaizeJWTTest do
     {:ok, ok_jwt} = %{id: 1, name: "Raymond Luxury Yacht", role: "user"}
     |> generate_token({0, 120})
 
-    {:ok, error_jwt} = %{id: 1, name: "Raymond Luxury Yacht"}
+    {:ok, norole_jwt} = %{id: 1, name: "Raymond Luxury Yacht"}
+    |> generate_token({0, 120})
+
+    {:ok, error_jwt} = %{name: "Raymond Luxury Yacht"}
     |> generate_token({0, 120})
 
     {:ok, add_to_store} = %{id: 2, name: "Gladys Stoate", role: "user"}
     |> generate_token({0, 120})
     LogoutManager.store_jwt(add_to_store)
 
-    {:ok, %{ok_jwt: ok_jwt, error_jwt: error_jwt, add_to_store: add_to_store}}
+    {:ok, %{ok_jwt: ok_jwt, norole_jwt: norole_jwt,
+      error_jwt: error_jwt, add_to_store: add_to_store}}
   end
 
   test "verify token with correct signature", %{ok_jwt: ok_jwt} do
@@ -30,7 +34,12 @@ defmodule OpenmaizeJWTTest do
     assert message =~ "Invalid"
   end
 
-  test "verify fails if jwt has no role", %{error_jwt: error_jwt} do
+  test "verify succeeds if jwt has no role", %{norole_jwt: norole_jwt} do
+    {:ok, user} = verify_token(norole_jwt)
+    assert user.name == "Raymond Luxury Yacht"
+  end
+
+  test "verify fails if jwt has no id", %{error_jwt: error_jwt} do
     {:error, message} = verify_token(error_jwt)
     assert message =~ "Incomplete"
   end
