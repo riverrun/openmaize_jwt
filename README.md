@@ -4,17 +4,19 @@ JSON Web Token library for use with the Openmaize authentication library.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+1. Add openmaize and openmaize_jwt to your `mix.exs` dependencies
 
-  1. Add openmaize_jwt to your list of dependencies in `mix.exs`:
+  ```elixir
+  defp deps do
+    [{:openmaize, "~> 1.0"},
+    {:openmaize_jwt, "~> 0.12"}]
+  end
+  ```
 
-        def deps do
-          [{:openmaize_jwt, "~> 0.11"}]
-        end
+2. List `:openmaize` and `:openmaize_jwt` as application dependencies
 
-  2. Ensure openmaize_jwt is started before your application:
-
-        def application do
-          [applications: [:openmaize_jwt]]
-        end
-
+  ```elixir
+  def application do
+    [applications: [:logger, :openmaize, :openmaize_jwt]]
+  end
+  ```
