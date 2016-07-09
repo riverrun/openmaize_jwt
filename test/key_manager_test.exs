@@ -20,15 +20,4 @@ defmodule KeyManagerTest do
     assert current_kid == "101"
   end
 
-  test "get state from file" do
-    dest = Path.join(Application.app_dir(:openmaize_jwt, "priv"), "key_state.json")
-    Application.stop :openmaize_jwt
-    :ok = File.rm dest
-    {:ok, _} = File.copy Path.join([__DIR__, "support", "key_state.json"]), dest
-    Application.start :openmaize_jwt
-    key = "HFFRR7/Llzjf6fRIagRirI4s4NfwV8yw9/W46OYgso4="
-    assert KM.get_key("100") == key
-    assert KM.get_key("101") == nil
-  end
-
 end
