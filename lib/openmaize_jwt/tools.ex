@@ -3,34 +3,43 @@ defmodule OpenmaizeJWT.Tools do
   Various tools that are used with the management of JSON Web Tokens.
   """
 
-  alias OpenmaizeJWT.KeyManager
+  alias OpenmaizeJWT.Config
+  alias Plug.Crypto.KeyGenerator
+
+  @doc """
+  Generate a signing salt for use with this module.
+
+  After running gen_salt, add the following lines to your config:
+
+      config :openmaize,
+        signing_salt: "generated salt"
+  """
+  def gen_salt(length \\ 16)
+  def gen_salt(length) when length > 15 do
+    :crypto.strong_rand_bytes(length) |> Base.encode64 |> binary_part(0, length)
+  end
+  def gen_salt(_) do
+    raise ArgumentError, "The salt should be 16 bytes or longer"
+  end
 
   @doc """
   The hash to be used when checking the signature.
   """
-  def get_mac(data, alg, kid) do
-    :crypto.hmac(alg, get_key(kid), data)
+  def get_mac(data, alg, secret) do
+    :crypto.hmac(alg, get_key(secret, Config.signing_salt), data)
   end
 
   @doc """
-  The secret key to be used to check the signature.
   """
-  def get_key(kid) do
-    KeyManager.get_key(kid)
+  def get_key(_, salt) when is_nil(salt) or byte_size(salt) < 16 do
+    raise ArgumentError, "You need to set the `signing_salt` config value" <>
+    " to a value that is 16 bytes or longer"
+  end
+  def get_key(secret, _) when  is_nil(secret) or byte_size(secret) < 64 do
+    raise ArgumentError, "The secret should be 64 bytes or longer"
+  end
+  def get_key(secret, salt) do
+    KeyGenerator.generate(secret, salt)
   end
 
-  @doc """
-  The current value for `kid` in the JWT header.
-  """
-  def current_kid do
-    KeyManager.get_current_kid()
-  end
-
-  @doc """
-  The current time in milliseconds.
-  """
-  def current_time do
-    {mega, secs, micro} = :os.timestamp
-    trunc(((mega * 1000000 + secs) * 1000) + (micro / 1000))
-  end
 end

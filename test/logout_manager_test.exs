@@ -1,15 +1,15 @@
-defmodule LogoutManagerTest do
+defmodule OpenmaizeJWT.LogoutManagerTest do
   use ExUnit.Case
 
-  import OpenmaizeJWT.Create
+  import OpenmaizeJWT.{Create, TestConn}
   alias OpenmaizeJWT.LogoutManager, as: LM
 
   setup_all do
     {:ok, jwt} = %{id: 10, name: "Inspector Dim", role: "user"}
-    |> generate_token({0, 120})
+    |> generate_token({0, 120}, get_secret())
 
     {:ok, exp_jwt} = %{id: 11, name: "Mr Spare Button", role: "user"}
-    |> generate_token({0, -10})
+    |> generate_token({0, -10}, get_secret())
 
     {:ok, %{jwt: jwt, exp_jwt: exp_jwt}}
   end
@@ -28,6 +28,20 @@ defmodule LogoutManagerTest do
     {:noreply, store = newstate} = LM.handle_info(:clean, state)
     assert newstate != state
     refute store[exp_jwt]
+  end
+
+  test "get state from file" do
+    dest = Path.join(Application.app_dir(:openmaize_jwt, "priv"), "logout_state.json")
+    Application.stop :openmaize_jwt
+    :ok = File.rm dest
+    {:ok, _} = File.copy Path.join([__DIR__, "support", "logout_state.json"]), dest
+    Application.start :openmaize_jwt
+    jwt = "eyJ0eXAiOiJKV1QiLCJraWQiOiIxMDAiLCJhbGciOiJIUzUxMiJ9." <>
+    "eyJ1c2VybmFtZSI6IkNvbHRyYW5lIiwicm9sZSI6ImJlc3QiLCJuYmYiOjE0Nj" <>
+    "YzMTY3MTEwOTEsImlkIjoyMSwiZXhwIjoxNDY2MzIzOTExMDkxfQ.UQqgPVUx5BO" <>
+    "2zeFeWLsxsM9QPuTWhBsP0jxcvrtoL5x71Rk1hroMyXTHf6GrUMHHrqnalQIoEi91pMKNeRPm_w"
+    assert LM.query_jwt(jwt)
+    refute LM.query_jwt(jwt <> "a")
   end
 
 end

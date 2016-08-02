@@ -1,17 +1,24 @@
 defmodule OpenmaizeJWT.LogoutManager do
   use GenServer
 
-  import OpenmaizeJWT.{Tools, Verify}
+  import OpenmaizeJWT.Verify
 
   @sixty_mins 3_600_000
+  @logout_state Path.join(Application.app_dir(:openmaize_jwt, "priv"), "logout_state.json")
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init([]) do
+    Process.flag(:trap_exit, true)
+    state = case File.read(@logout_state) do
+      {:ok, state} -> Poison.decode!(state)
+      {:error, _} -> Map.new()
+    end
+    File.rm @logout_state
     Process.send_after(self(), :clean, @sixty_mins)
-    {:ok, Map.new()}
+    {:ok, state}
   end
 
   def get_state(), do: GenServer.call(__MODULE__, :get_state)
@@ -44,8 +51,13 @@ defmodule OpenmaizeJWT.LogoutManager do
     {:ok, state}
   end
 
+  def terminate(_reason, state) do
+    File.write @logout_state, Poison.encode!(state)
+    :ok
+  end
+
   defp clean_store(store) do
-    time = current_time()
+    time = System.system_time(:milli_seconds)
     :maps.filter fn _, y -> y > time end, store
   end
 end

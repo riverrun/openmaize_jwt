@@ -4,11 +4,9 @@ defmodule OpenmaizeJWT.Plug do
 
   ## Storage of JSON Web Tokens
 
-  The JWTs need to be stored somewhere, either in cookies or sessionStorage
-  (or localStorage), so that they can be used in subsequent requests.
-  If you want to store the token in sessionStorage, you will need to add
-  the token to sessionStorage with the front-end framework you are using
-  and add the token to the request headers for each request.
+  In many cases, the JWTs need to be stored somewhere, either in cookies
+  or sessionStorage (or localStorage), so that they can be used in subsequent
+  requests. You need to handle storing the JWT yourself.
 
   If you decide to store the token in sessionStorage, and not in a cookie,
   you will not need to use the `protect_from_forgery` (csrf protection) plug.
@@ -18,28 +16,31 @@ defmodule OpenmaizeJWT.Plug do
 
   import Plug.Conn
   import OpenmaizeJWT.Create
-  alias OpenmaizeJWT.Config
+  alias OpenmaizeJWT.{Config, LogoutManager}
 
   @doc """
   Generate JWT based on the user information.
 
-  The JWT is then either stored in a cookie or added to the body of the
-  response.
+  The JWT is then added to the body of the response.
   """
-  def add_token(conn, user, storage, uniq, override_exp \\ nil) do
-    token_validity = override_exp || Config.token_validity
+  def add_token(conn, user, uniq) do
     user = Map.take(user, [:id, :role, uniq]) |> Map.merge(Config.token_data)
-    {:ok, token} = generate_token user, {0, token_validity}
-    put_token(conn, user, token, storage, token_validity)
+    {:ok, token} = generate_token user, {0, Config.token_validity}, conn.secret_key_base
+    resp(conn, 200, ~s({"access_token": "#{token}"}))
   end
 
-  defp put_token(conn, user, token, :cookie, validity) do
-    opts = [http_only: true, max_age: validity * 60]
-    put_resp_cookie(conn, "access_token", token, opts)
-    |> put_private(:openmaize_user, user)
+  @doc """
+  Handle logout.
+  """
+  def logout_user(%Plug.Conn{req_cookies: %{"access_token" => token}} = conn) do
+    LogoutManager.store_jwt(token)
+    assign(conn, :current_user, nil)
   end
-  defp put_token(conn, user, token, nil, _) do
-    resp(conn, 200, ~s({"access_token": "#{token}"}))
-    |> put_private(:openmaize_user, user)
+  def logout_user(%Plug.Conn{req_headers: headers} = conn) do
+    case List.keyfind(headers, "authorization", 0) do
+      {_, "Bearer " <> token} -> LogoutManager.store_jwt(token)
+      nil -> nil
+    end
+    assign(conn, :current_user, nil)
   end
 end
