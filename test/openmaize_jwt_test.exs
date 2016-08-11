@@ -1,21 +1,21 @@
 defmodule OpenmaizeJWTTest do
   use ExUnit.Case
 
-  import OpenmaizeJWT.{Create, TestConn, Verify}
+  import OpenmaizeJWT.{Create, Verify}
   alias OpenmaizeJWT.LogoutManager
 
   setup_all do
     {:ok, ok_jwt} = %{id: 1, name: "Raymond Luxury Yacht", role: "user"}
-    |> generate_token({0, 120}, get_secret())
+    |> generate_token({0, 120})
 
     {:ok, norole_jwt} = %{id: 1, name: "Raymond Luxury Yacht"}
-    |> generate_token({0, 120}, get_secret())
+    |> generate_token({0, 120})
 
     {:ok, error_jwt} = %{name: "Raymond Luxury Yacht"}
-    |> generate_token({0, 120}, get_secret())
+    |> generate_token({0, 120})
 
     {:ok, add_to_store} = %{id: 2, name: "Gladys Stoate", role: "user"}
-    |> generate_token({0, 120}, get_secret())
+    |> generate_token({0, 120})
     LogoutManager.store_jwt(add_to_store)
 
     {:ok, %{ok_jwt: ok_jwt, norole_jwt: norole_jwt,
@@ -23,29 +23,29 @@ defmodule OpenmaizeJWTTest do
   end
 
   test "verify token with correct signature", %{ok_jwt: ok_jwt} do
-    {:ok, user} = verify_token(ok_jwt, get_secret())
+    {:ok, user} = verify_token(ok_jwt)
     assert user.name == "Raymond Luxury Yacht"
     assert user.role == "user"
   end
 
   test "verify token with invalid signature", %{ok_jwt: ok_jwt} do
     token = ok_jwt <> "a"
-    {:error, message} = verify_token(token, get_secret())
+    {:error, message} = verify_token(token)
     assert message =~ "Invalid"
   end
 
   test "verify succeeds if jwt has no role", %{norole_jwt: norole_jwt} do
-    {:ok, user} = verify_token(norole_jwt, get_secret())
+    {:ok, user} = verify_token(norole_jwt)
     assert user.name == "Raymond Luxury Yacht"
   end
 
   test "verify fails if jwt has no id", %{error_jwt: error_jwt} do
-    {:error, message} = verify_token(error_jwt, get_secret())
+    {:error, message} = verify_token(error_jwt)
     assert message =~ "Incomplete"
   end
 
   test "verify fails after jwt has been added to jwt_store", %{add_to_store: add_to_store} do
-    {:error, message} = verify_token(add_to_store, get_secret())
+    {:error, message} = verify_token(add_to_store)
     assert message =~ "logged out"
   end
 

@@ -2,12 +2,11 @@ defmodule OpenmaizeJWT.LoginTest do
   use ExUnit.Case
   use Plug.Test
 
-  import OpenmaizeJWT.{Plug, TestConn}
+  import OpenmaizeJWT.Plug
 
   def call(name, password) do
     conn(:post, "/login",
          %{"user" => %{"username" => name, "password" => password}})
-    |> sign_conn
     |> login_check(name, password)
     |> handle_login(%{})
   end

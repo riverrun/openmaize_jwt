@@ -14,9 +14,9 @@ defmodule OpenmaizeJWT.Verify do
   checks that it has  an `id` and valid `nbf` and `exp` values in the body,
   and that it uses a supported algorithm, either HMAC-sha512 or HMAC-sha256.
   """
-  def verify_token(token, secret) do
+  def verify_token(token) do
     case LogoutManager.query_jwt(token) do
-      false -> :binary.split(token, ".", [:global]) |> check_valid(secret)
+      false -> :binary.split(token, ".", [:global]) |> check_valid
       _ -> {:error, "Already logged out"}
     end
   end
@@ -30,10 +30,10 @@ defmodule OpenmaizeJWT.Verify do
     exp
   end
 
-  defp check_valid([enc_header, enc_payload, sign], secret) do
+  defp check_valid([enc_header, enc_payload, sign]) do
     with [header, payload] <- Enum.map([enc_header, enc_payload], &to_map/1),
         {:ok, alg} <- check_header(header),
-        :ok <- check_sign(alg, secret, sign, enc_header, enc_payload),
+        :ok <- check_sign(alg, sign, enc_header, enc_payload),
         :ok <- check_payload(payload),
     do: {:ok, payload}
   end
@@ -58,8 +58,9 @@ defmodule OpenmaizeJWT.Verify do
   end
   defp check_header(_), do: {:error, "Invalid header"}
 
-  defp check_sign(alg, secret, sign, enc_header, enc_payload) do
-    if sign |> urldec64 == get_mac(enc_header <> "." <> enc_payload, alg, secret) do
+  defp check_sign(alg, sign, enc_header, enc_payload) do
+    if sign |> urldec64 ==
+      get_mac(enc_header <> "." <> enc_payload, alg) do
       :ok
     else
       {:error, "Invalid token"}

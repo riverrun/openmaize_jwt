@@ -1,15 +1,15 @@
 defmodule OpenmaizeJWT.LogoutManagerTest do
   use ExUnit.Case
 
-  import OpenmaizeJWT.{Create, TestConn}
+  import OpenmaizeJWT.Create
   alias OpenmaizeJWT.LogoutManager, as: LM
 
   setup_all do
     {:ok, jwt} = %{id: 10, name: "Inspector Dim", role: "user"}
-    |> generate_token({0, 120}, get_secret())
+    |> generate_token({0, 120})
 
     {:ok, exp_jwt} = %{id: 11, name: "Mr Spare Button", role: "user"}
-    |> generate_token({0, -10}, get_secret())
+    |> generate_token({0, -10})
 
     {:ok, %{jwt: jwt, exp_jwt: exp_jwt}}
   end

@@ -28,10 +28,10 @@ defmodule OpenmaizeJWT.Create do
   the token can be used, and `token_validity`, which is the number of
   minutes that the token will be valid for.
   """
-  def generate_token(user, {nbf_delay, token_validity}, secret) do
+  def generate_token(user, {nbf_delay, token_validity}) do
     nbf = get_nbf(nbf_delay * 60_000)
     Map.merge(user, %{nbf: nbf, exp: get_expiry(nbf, token_validity)})
-    |> encode(Config.get_token_alg, secret)
+    |> encode(Config.get_token_alg)
   end
 
   defp get_nbf(nbf_delay) when is_integer(nbf_delay) do
@@ -44,10 +44,10 @@ defmodule OpenmaizeJWT.Create do
   end
   defp get_expiry(_, _), do: raise ArgumentError, "exp should be an integer"
 
-  defp encode(payload, {header_alg, encode_alg}, secret) do
+  defp encode(payload, {header_alg, encode_alg}) do
     data = (%{typ: "JWT", alg: header_alg} |> from_map) <>
     "." <> (payload |> from_map)
-    {:ok, data <> "." <> (get_mac(data, encode_alg, secret) |> urlenc64)}
+    {:ok, data <> "." <> (get_mac(data, encode_alg) |> urlenc64)}
   end
 
   defp from_map(input) do

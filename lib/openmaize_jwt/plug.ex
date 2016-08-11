@@ -25,7 +25,7 @@ defmodule OpenmaizeJWT.Plug do
   """
   def add_token(conn, user, uniq) do
     user = Map.take(user, [:id, :role, uniq]) |> Map.merge(Config.token_data)
-    {:ok, token} = generate_token user, {0, Config.token_validity}, conn.secret_key_base
+    {:ok, token} = generate_token user, {0, Config.token_validity}
     resp(conn, 200, ~s({"access_token": "#{token}"}))
   end
 

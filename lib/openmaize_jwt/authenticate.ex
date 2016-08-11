@@ -36,20 +36,20 @@ defmodule OpenmaizeJWT.Authenticate do
   current_user is set to nil.
   """
   def call(%Plug.Conn{req_cookies: %{"access_token" => token}} = conn, _) do
-    check_token(token, conn.secret_key_base) |> set_current_user(conn)
+    check_token(token) |> set_current_user(conn)
   end
   def call(%Plug.Conn{req_headers: headers} = conn, _) do
     case List.keyfind(headers, "authorization", 0) do
-      {_, token} -> check_token(token, conn.secret_key_base) |> set_current_user(conn)
+      {_, token} -> check_token(token) |> set_current_user(conn)
       nil -> set_current_user(nil, conn)
     end
   end
 
-  defp check_token("Bearer " <> token, secret), do: check_token(token, secret)
-  defp check_token(token, secret) when is_binary(token) do
-    Verify.verify_token(token, secret)
+  defp check_token("Bearer " <> token), do: check_token(token)
+  defp check_token(token) when is_binary(token) do
+    Verify.verify_token(token)
   end
-  defp check_token(_, _), do: nil
+  defp check_token(_), do: nil
 
   defp set_current_user({:ok, data}, conn), do: assign(conn, :current_user, data)
   defp set_current_user({:error, _}, conn), do: assign(conn, :current_user, nil)
