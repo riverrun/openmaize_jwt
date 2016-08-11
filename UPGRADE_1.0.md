@@ -2,7 +2,7 @@
 
 Add the following to mix.exs and run `mix deps.update openmaize_jwt`:
 
-    {:openmaize_jwt, "~> 1.0"}
+    {:openmaize_jwt, "~> 1.0.0"}
 
 You can remove the entry for openmaize, which will be installed as
 a dependency of openmaize_jwt.
