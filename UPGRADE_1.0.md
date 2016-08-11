@@ -36,6 +36,11 @@ also has options for the one-time passwords.
 The `handle_logout` function in the Authorize module shows an
 example of adding the JSON Web Token to the logout manager.
 
+### Change to the database module
+
+In the Openmaize.Database behaviour and the MyApp.OpenmaizeEcto module,
+the `find_user_byid` function has been renamed to `find_user_by_id`.
+
 ### Changes to the Authorize and Confirm module templates
 
 The following changes have been made to the examples in the Authorize
