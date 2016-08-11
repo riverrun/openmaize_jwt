@@ -11,7 +11,7 @@ defmodule OpenmaizeJWT.Config do
   | token_validity     | int     | 120 (minutes)  |
   | token_data         | list    | %{}      |
 
-  `signing_salt` must be set before using OpenmaizeJWT.
+  `signing_key` must be set before using OpenmaizeJWT.
 
   ## Examples
 

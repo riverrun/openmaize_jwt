@@ -5,7 +5,7 @@ defmodule OpenmaizeJWT.Verify do
 
   import Base
   import OpenmaizeJWT.Tools
-  alias OpenmaizeJWT.LogoutManager
+  alias OpenmaizeJWT.{Config, LogoutManager}
 
   @doc """
   Decode the JWT and check that it is valid.
@@ -60,7 +60,7 @@ defmodule OpenmaizeJWT.Verify do
 
   defp check_sign(alg, sign, enc_header, enc_payload) do
     if sign |> urldec64 ==
-      get_mac(enc_header <> "." <> enc_payload, alg) do
+      get_mac(enc_header <> "." <> enc_payload, alg, Config.signing_key) do
       :ok
     else
       {:error, "Invalid token"}

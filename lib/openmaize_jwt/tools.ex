@@ -3,8 +3,6 @@ defmodule OpenmaizeJWT.Tools do
   Various tools that are used with the management of JSON Web Tokens.
   """
 
-  alias OpenmaizeJWT.Config
-
   @doc """
   Generate a signing salt for use with this module.
 
@@ -18,13 +16,16 @@ defmodule OpenmaizeJWT.Tools do
     :crypto.strong_rand_bytes(length) |> Base.encode64 |> binary_part(0, length)
   end
   def gen_key(_) do
-    raise ArgumentError, "The secret should be 64 bytes or longer"
+    raise ArgumentError, "The signing key should be 64 bytes or longer"
   end
 
   @doc """
   The hash to be used when checking the signature.
   """
-  def get_mac(data, alg) do
-    :crypto.hmac(alg, Config.signing_key, data)
+  def get_mac(_, _, key) when is_nil(key) or byte_size(key) < 64 do
+    raise ArgumentError, "The signing key should be 64 bytes or longer"
+  end
+  def get_mac(data, alg, signing_key) do
+    :crypto.hmac(alg, signing_key, data)
   end
 end

@@ -47,7 +47,7 @@ defmodule OpenmaizeJWT.Create do
   defp encode(payload, {header_alg, encode_alg}) do
     data = (%{typ: "JWT", alg: header_alg} |> from_map) <>
     "." <> (payload |> from_map)
-    {:ok, data <> "." <> (get_mac(data, encode_alg) |> urlenc64)}
+    {:ok, data <> "." <> (get_mac(data, encode_alg, Config.signing_key) |> urlenc64)}
   end
 
   defp from_map(input) do

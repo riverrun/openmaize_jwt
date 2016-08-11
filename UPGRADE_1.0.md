@@ -7,6 +7,11 @@ Add the following to mix.exs and run `mix deps.update openmaize_jwt`:
 You can remove the entry for openmaize, which will be installed as
 a dependency of openmaize_jwt.
 
+### Config
+
+You need to add a signing key to the config. See the documentation for
+`OpenmaizeJWT.Tools.gen_key` for more information.
+
 ### OpenmaizeJWT.Authenticate
 
 In the `web/router.ex` file, change the call to Openmaize.Authenticate to:
@@ -71,13 +76,9 @@ and Confirm modules and tests:
 the following lines at the beginning of the Authorize test
 
   ```elixir
-  @secret String.duplicate("12345678", 8)
-
   {:ok, user_token} = %{id: 3, email: "tony@mail.com", role: "user"}
-                      |> generate_token({0, 1440}, @secret)
+                      |> generate_token({0, 1440})
   ```
-
-You will need to add the `secret` argument to all other calls to `generate_token`.
 
 There are several other changes to the Authorize test. For more information,
 see the example app at [Openmaize-phoenix](https://github.com/riverrun/openmaize-phoenix).
